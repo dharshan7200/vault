@@ -13,7 +13,8 @@ const App = {
         path: [], // To keep track of folder names for breadcrumbs
         currentFileIndex: -1,
         selectedFiles: new Set(),
-        selectedFolders: new Set()
+        selectedFolders: new Set(),
+        activeObjectURLs: new Set()
     },
 
     elements: {
@@ -230,16 +231,33 @@ const App = {
         if (totalSelected === 0) return;
 
         if (confirm(`Are you sure you want to delete ${totalSelected} selected items and their contents?`)) {
+            const allFiles = await VaultDB.getAllFiles();
+            const allFolders = await VaultDB.getAllFolders();
+
+            const recursiveDelete = async (folderId) => {
+                // Delete files in this folder
+                const folderFiles = allFiles.filter(f => f.folderId === folderId);
+                for (const f of folderFiles) {
+                    await VaultDB.deleteFile(f.id);
+                }
+
+                // Delete subfolders recursively
+                const subFolders = allFolders.filter(f => f.parentId === folderId);
+                for (const sub of subFolders) {
+                    await recursiveDelete(sub.id);
+                    await VaultDB.deleteFolder(sub.id);
+                }
+            };
+
             for (const fileId of this.state.selectedFiles) {
                 await VaultDB.deleteFile(fileId);
             }
+
             for (const folderId of this.state.selectedFolders) {
+                await recursiveDelete(folderId);
                 await VaultDB.deleteFolder(folderId);
-                // Also delete files in that folder
-                const allFiles = await VaultDB.getAllFiles();
-                const folderFiles = allFiles.filter(f => f.folderId === folderId);
-                for (const f of folderFiles) await VaultDB.deleteFile(f.id);
             }
+
             this.clearSelection();
             await this.loadFiles();
         }
@@ -453,7 +471,13 @@ const App = {
         }
     },
 
+    revokeObjectURLs() {
+        this.state.activeObjectURLs.forEach(url => URL.revokeObjectURL(url));
+        this.state.activeObjectURLs.clear();
+    },
+
     renderFiles() {
+        this.revokeObjectURLs();
         this.elements.fileList.innerHTML = '';
         if (this.state.files.length === 0 && this.state.folders.length === 0) {
             this.elements.emptyState.classList.remove('hidden');
@@ -481,11 +505,14 @@ const App = {
         // Render Files
         this.state.files.forEach((file, index) => {
             const isSelected = this.state.selectedFiles.has(file.id);
+            const url = URL.createObjectURL(file.blob);
+            this.state.activeObjectURLs.add(url);
+
             const card = document.createElement('div');
             card.className = `file-card ${isSelected ? 'selected' : ''}`;
             card.innerHTML = `
                 <div class="file-type-icon">${file.mimeType.split('/')[0]}</div>
-                <img class="file-thumb" src="${URL.createObjectURL(file.blob)}" alt="${file.storedName}">
+                <img class="file-thumb" src="${url}" alt="${file.storedName}">
                 <div class="file-info">
                     <span class="file-name">${file.storedName.replace(/\.lock$/i, '')}</span>
                 </div>
