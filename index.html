@@ -41,7 +41,6 @@
                 <p id="auth-error" class="error-msg hidden">Invalid PIN. Try again.</p>
             </div>
         </section>
-
         <!-- Vault Dashboard -->
         <section id="vault-screen" class="screen hidden">
             <header>
@@ -49,6 +48,7 @@
                     <h1>Private Vault</h1>
                     <div class="header-actions">
                         <button id="logout-btn" class="icon-btn" title="Lock Vault">🔒</button>
+                        <button id="new-folder-btn" class="secondary-btn">New Folder</button>
                         <label for="file-upload" class="primary-btn">
                             <span>Upload Files</span>
                             <input type="file" id="file-upload" multiple accept="image/*,video/*" class="hidden">
@@ -58,6 +58,15 @@
             </header>
 
             <main>
+                <nav id="breadcrumbs" class="breadcrumbs">
+                    <span class="breadcrumb-item" data-id="root">Root</span>
+                </nav>
+                <div id="bulk-actions" class="bulk-actions">
+                    <button id="select-all-btn" class="secondary-btn">Select All</button>
+                    <button id="export-selected-btn" class="primary-btn">Download Selected (ZIP)</button>
+                    <button id="delete-selected-btn" class="danger-btn">Delete Selected</button>
+                    <button id="clear-selection-btn" class="secondary-btn">Clear Selection</button>
+                </div>
                 <div id="file-list" class="grid">
                     <!-- Files will be rendered here -->
                 </div>
@@ -74,7 +83,9 @@
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <button id="close-preview" class="close-btn">&times;</button>
+                <button id="prev-btn" class="nav-btn left">&lsaquo;</button>
                 <div id="media-viewport"></div>
+                <button id="next-btn" class="nav-btn right">&rsaquo;</button>
                 <div class="modal-footer">
                     <span id="preview-filename"></span>
                     <div class="modal-actions">
@@ -87,6 +98,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="crypto.js"></script>
     <script src="db.js"></script>
     <script src="app.js"></script>

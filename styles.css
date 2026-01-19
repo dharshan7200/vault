@@ -178,11 +178,88 @@ main {
     flex-grow: 1;
 }
 
+/* Breadcrumbs */
+.breadcrumbs {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 20px;
+    color: var(--text-dim);
+    font-size: 14px;
+    align-items: center;
+}
+
+.breadcrumb-item {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.breadcrumb-item:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-item:not(:last-child)::after {
+    content: '/';
+    margin-left: 8px;
+    color: var(--glass-border);
+}
+
+/* Selection & Bulk Actions */
+.select-box {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--glass-border);
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.select-box.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.select-box.selected::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.bulk-actions {
+    display: none;
+    gap: 12px;
+    padding: 0 20px 20px;
+}
+
+.bulk-actions.active {
+    display: flex;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 24px;
     padding: 20px;
+}
+
+.file-card.folder .file-thumb {
+    background: #2d1b4d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+.file-card.folder .file-thumb::before {
+    content: '📁';
 }
 
 .file-card {
@@ -357,7 +434,55 @@ main {
     cursor: pointer;
 }
 
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    color: white;
+    font-size: 48px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 1002;
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.nav-btn.left {
+    left: -80px;
+}
+
+.nav-btn.right {
+    right: -80px;
+}
+
 /* Responsive */
+@media (max-width: 1000px) {
+    .nav-btn.left {
+        left: 10px;
+    }
+
+    .nav-btn.right {
+        right: 10px;
+    }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 32px;
+    }
+}
+
 @media (max-width: 600px) {
     .glass-card {
         padding: 24px;
