@@ -22,7 +22,8 @@ const App = {
         emptyState: document.getElementById('empty-state'),
         previewModal: document.getElementById('preview-modal'),
         mediaViewport: document.getElementById('media-viewport'),
-        previewFilename: document.getElementById('preview-filename')
+        previewFilename: document.getElementById('preview-filename'),
+        storageInfo: document.getElementById('storage-info')
     },
 
     async init() {
@@ -142,6 +143,16 @@ const App = {
         const files = await VaultDB.getAllFiles();
         this.state.files = files;
         this.renderFiles();
+        this.updateStorageInfo();
+    },
+
+    async updateStorageInfo() {
+        if (navigator.storage && navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            const used = (estimate.usage / (1024 * 1024)).toFixed(1);
+            const total = (estimate.quota / (1024 * 1024 * 1024)).toFixed(1);
+            this.elements.storageInfo.textContent = `Used: ${used}MB / Available: ~${total}GB`;
+        }
     },
 
     renderFiles() {

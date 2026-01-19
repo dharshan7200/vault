@@ -198,7 +198,7 @@ main {
 
 .file-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .file-thumb {
@@ -214,7 +214,7 @@ main {
     left: 0;
     right: 0;
     padding: 12px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
 }
 
 .file-name {
@@ -229,7 +229,7 @@ main {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 10px;
@@ -253,6 +253,15 @@ main {
     opacity: 0.3;
 }
 
+.storage-text {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 40px;
+    padding-bottom: 40px;
+    opacity: 0.7;
+}
+
 /* Modal */
 .modal {
     position: fixed;
@@ -272,7 +281,7 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(8px);
 }
 
@@ -295,7 +304,8 @@ main {
     border-radius: 12px;
 }
 
-#media-viewport img, #media-viewport video {
+#media-viewport img,
+#media-viewport video {
     max-width: 100%;
     max-height: 70vh;
     border-radius: 8px;
@@ -352,10 +362,12 @@ main {
     .glass-card {
         padding: 24px;
     }
+
     .grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
+
     .header-content {
         flex-direction: column;
         gap: 16px;
