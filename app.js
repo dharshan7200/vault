@@ -43,8 +43,8 @@ const App = {
     },
 
     async init() {
-        // PIN is fixed to "2006"
-        this.state.isSetup = true;
+        const storedPin = localStorage.getItem('vault_pin_hash');
+        this.state.isSetup = !!storedPin;
 
         this.updateAuthUI();
         this.bindEvents();
@@ -70,8 +70,13 @@ const App = {
     },
 
     updateAuthUI() {
-        this.elements.authTitle.textContent = 'Unlock Vault';
-        this.elements.authDesc.textContent = 'Enter the master PIN to access files.';
+        if (this.state.isSetup) {
+            this.elements.authTitle.textContent = 'Unlock Vault';
+            this.elements.authDesc.textContent = 'Enter your PIN to access files.';
+        } else {
+            this.elements.authTitle.textContent = 'Setup Vault';
+            this.elements.authDesc.textContent = 'Create a 4-digit PIN for your storage.';
+        }
     },
 
     bindEvents() {
@@ -395,14 +400,23 @@ const App = {
         if (this.state.currentPin.length !== 4) return;
 
         const hash = await CryptoUtils.hashPIN(this.state.currentPin);
-        const fixedHash = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c'; // hash of "1111"
-        //command to change pin : python -c "import hashlib; print(hashlib.sha256('1111'.encode()).hexdigest())"
-        if (hash === fixedHash) {
+
+        if (!this.state.isSetup) {
+            // Setup Mode: Save PIN
+            localStorage.setItem('vault_pin_hash', hash);
+            this.state.isSetup = true;
             this.state.isAuthenticated = true;
             this.enterVault();
         } else {
-            this.elements.authError.classList.remove('hidden');
-            this.clearPin();
+            // Login Mode: Verify PIN
+            const storedHash = localStorage.getItem('vault_pin_hash');
+            if (hash === storedHash) {
+                this.state.isAuthenticated = true;
+                this.enterVault();
+            } else {
+                this.elements.authError.classList.remove('hidden');
+                this.clearPin();
+            }
         }
     },
 

@@ -1,14 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
 :root {
-    --bg-color: #0d0d0d;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --text-main: #f8fafc;
-    --text-dim: #94a3b8;
-    --danger: #ef4444;
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --bg-color: #05050a;
+    --card-bg: rgba(15, 15, 25, 0.7);
+    --primary: #ff007f;
+    /* Neon Pink */
+    --primary-hover: #ff1a8c;
+    --accent: #00f2ff;
+    /* Cyber Cyan */
+    --text-main: #ffffff;
+    --text-dim: #9ca3af;
+    --danger: #ff3b3b;
+    --glass-border: rgba(255, 0, 127, 0.2);
+    --glow: 0 0 15px rgba(255, 0, 127, 0.5);
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 5px var(--primary);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--primary);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--primary);
+    }
+}
+
+@keyframes border-glow {
+    0% {
+        border-color: var(--glass-border);
+    }
+
+    50% {
+        border-color: var(--primary);
+    }
+
+    100% {
+        border-color: var(--glass-border);
+    }
 }
 
 * {
@@ -40,19 +72,23 @@ body {
 #auth-screen {
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at center, #1e1b4b 0%, #0d0d0d 100%);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 127, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%),
+        #05050a;
 }
 
 .glass-card {
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    border-radius: 32px;
     padding: 40px;
     width: 100%;
     max-width: 400px;
     text-align: center;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 127, 0.05);
+    animation: border-glow 4s infinite ease-in-out;
 }
 
 h1 {
@@ -74,17 +110,18 @@ p {
 }
 
 .pin-dot {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 2px solid var(--primary);
-    transition: background-color 0.2s, transform 0.2s;
+    border: 2px solid var(--accent);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pin-dot.filled {
     background-color: var(--primary);
-    transform: scale(1.1);
-    box-shadow: 0 0 15px var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.2);
+    box-shadow: var(--glow);
 }
 
 .numpad {
@@ -94,19 +131,26 @@ p {
 }
 
 .num-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     color: white;
     font-size: 24px;
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 20px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.num-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+    transform: translateY(-2px);
 }
 
 .num-btn:active {
     background: var(--primary);
-    transform: scale(0.95);
+    transform: scale(0.9);
+    box-shadow: var(--glow);
 }
 
 .num-btn.action {
@@ -126,9 +170,12 @@ p {
 
 /* Vault Dashboard */
 header {
+    background: rgba(10, 10, 18, 0.8);
+    backdrop-filter: blur(10px);
     padding: 20px 0;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 2px solid var(--glass-border);
     margin-bottom: 32px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 .header-content {
@@ -137,7 +184,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 24px;
 }
 
 .header-actions {
@@ -149,16 +196,20 @@ header {
 .primary-btn {
     background: var(--primary);
     color: white;
-    padding: 12px 24px;
-    border-radius: 12px;
+    padding: 12px 28px;
+    border-radius: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s;
     display: inline-block;
+    border: none;
+    box-shadow: var(--glow);
 }
 
 .primary-btn:hover {
     background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px var(--primary);
 }
 
 .icon-btn {
@@ -194,7 +245,8 @@ main {
 }
 
 .breadcrumb-item:hover {
-    color: var(--primary);
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
 }
 
 .breadcrumb-item:not(:last-child)::after {
@@ -251,31 +303,35 @@ main {
 }
 
 .file-card.folder .file-thumb {
-    background: #2d1b4d;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 56px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .file-card.folder .file-thumb::before {
     content: '📁';
+    filter: drop-shadow(0 0 10px var(--accent));
 }
 
 .file-card {
     background: var(--card-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 24px;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     aspect-ratio: 1;
     position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .file-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(255, 0, 127, 0.2);
 }
 
 .file-thumb {
@@ -333,10 +389,12 @@ main {
 .storage-text {
     text-align: center;
     color: var(--text-dim);
-    font-size: 14px;
+    font-size: 13px;
     margin-top: 40px;
     padding-bottom: 40px;
-    opacity: 0.7;
+    opacity: 0.6;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 /* Modal */
@@ -392,35 +450,49 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    background: var(--card-bg);
-    border-radius: 16px;
+    padding: 24px;
+    background: rgba(15, 15, 25, 0.95);
+    border-radius: 24px;
     border: 1px solid var(--glass-border);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .modal-actions {
     display: flex;
-    gap: 12px;
+    gap: 16px;
 }
 
 .secondary-btn {
-    background: white;
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 10px 24px;
+    border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.secondary-btn:hover {
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
 }
 
 .danger-btn {
-    background: var(--danger);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    background: rgba(255, 59, 59, 0.1);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 10px 24px;
+    border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.danger-btn:hover {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 0 15px var(--danger);
 }
 
 .close-btn {
