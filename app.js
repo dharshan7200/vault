@@ -403,6 +403,14 @@ const App = {
 
         if (!this.state.isSetup) {
             // Setup Mode: Save PIN
+            const pin = this.state.currentPin;
+            const confirmed = confirm(`⚠️ DON'T FORGET YOUR PIN: ${pin}\n\nThis is your master key. You cannot change this PIN later, and there is no "Forgot PIN" option for your security.`);
+
+            if (!confirmed) {
+                this.clearPin();
+                return;
+            }
+
             localStorage.setItem('vault_pin_hash', hash);
             this.state.isSetup = true;
             this.state.isAuthenticated = true;
