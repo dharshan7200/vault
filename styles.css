@@ -222,6 +222,29 @@ header {
     color: white;
 }
 
+.caution-banner {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    padding: 16px 24px;
+    background: rgba(255, 165, 0, 0.1);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.caution-banner p {
+    margin-bottom: 0;
+    font-size: 14px;
+    color: #ffb86c;
+    text-align: left;
+}
+
+.caution-icon {
+    font-size: 20px;
+}
+
 main {
     max-width: 1200px;
     margin: 0 auto;
