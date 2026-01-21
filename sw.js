@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vault-v2';
+const CACHE_NAME = 'vault-v3';
 const ASSETS = [
     './',
     './index.html',
@@ -6,7 +6,8 @@ const ASSETS = [
     './app.js',
     './db.js',
     './crypto.js',
-    './manifest.json'
+    './manifest.json',
+    './favicon.png'
 ];
 
 self.addEventListener('install', (e) => {
