@@ -4,16 +4,16 @@
   "description": "Secure local media vault",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#1a1a1a",
+  "background_color": "#05050a",
+  "theme_color": "#ff007f",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2889/2889312.png",
+      "src": "favicon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2889/2889312.png",
+      "src": "favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
