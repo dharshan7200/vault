@@ -43,8 +43,17 @@ const App = {
     },
 
     async init() {
-        const storedPin = localStorage.getItem('vault_pin_hash');
-        this.state.isSetup = !!storedPin;
+        // Check server status
+        try {
+            const res = await fetch('/api/status');
+            const data = await res.json();
+            this.state.isSetup = data.isSetup;
+        } catch (e) {
+            console.warn('Backend not validating setup status, assuming local dev mode or first run', e);
+            // Fallback to local check if server fails? No, purely server-side means we rely on it.
+            // But for robustness in this specific 'fix' context, we default to false.
+            this.state.isSetup = false;
+        }
 
         this.updateAuthUI();
         this.bindEvents();
@@ -411,19 +420,49 @@ const App = {
                 return;
             }
 
-            localStorage.setItem('vault_pin_hash', hash);
-            this.state.isSetup = true;
-            this.state.isAuthenticated = true;
-            this.enterVault();
+            try {
+                const response = await fetch('/api/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin: this.state.currentPin })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.state.isSetup = true;
+                    this.state.isAuthenticated = true;
+                    this.enterVault();
+                } else {
+                    alert('Setup failed: ' + data.message);
+                    this.clearPin();
+                }
+            } catch (err) {
+                console.error('Setup error:', err);
+                alert('Server connection failed');
+            }
         } else {
             // Login Mode: Verify PIN
-            const storedHash = localStorage.getItem('vault_pin_hash');
-            if (hash === storedHash) {
-                this.state.isAuthenticated = true;
-                this.enterVault();
-            } else {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin: this.state.currentPin })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.state.isAuthenticated = true;
+                    this.enterVault();
+                } else {
+                    this.elements.authError.textContent = data.message || 'Invalid PIN';
+                    this.elements.authError.classList.remove('hidden');
+                    this.clearPin();
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                this.elements.authError.textContent = 'Server connection failed';
                 this.elements.authError.classList.remove('hidden');
-                this.clearPin();
             }
         }
     },
@@ -511,15 +550,32 @@ const App = {
         // Render Folders
         this.state.folders.forEach(folder => {
             const isSelected = this.state.selectedFolders.has(folder.id);
+
             const card = document.createElement('div');
             card.className = `file-card folder ${isSelected ? 'selected' : ''}`;
-            card.innerHTML = `
-                <div class="file-thumb"></div>
-                <div class="file-info">
-                    <span class="file-name">${folder.name}</span>
-                </div>
-                <div class="select-box ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); App.toggleSelection('folder', ${folder.id})"></div>
-            `;
+
+            const thumb = document.createElement('div');
+            thumb.className = 'file-thumb';
+            card.appendChild(thumb);
+
+            const info = document.createElement('div');
+            info.className = 'file-info';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'file-name';
+            nameSpan.textContent = folder.name; // Safe
+            info.appendChild(nameSpan);
+
+            card.appendChild(info);
+
+            const selectBox = document.createElement('div');
+            selectBox.className = `select-box ${isSelected ? 'selected' : ''}`;
+            selectBox.onclick = (e) => {
+                e.stopPropagation();
+                App.toggleSelection('folder', folder.id);
+            };
+            card.appendChild(selectBox);
+
             card.onclick = () => this.navigateToFolder(folder.id, folder.name);
             this.elements.fileList.appendChild(card);
         });
@@ -532,14 +588,36 @@ const App = {
 
             const card = document.createElement('div');
             card.className = `file-card ${isSelected ? 'selected' : ''}`;
-            card.innerHTML = `
-                <div class="file-type-icon">${file.mimeType.split('/')[0]}</div>
-                <img class="file-thumb" src="${url}" alt="${file.storedName}">
-                <div class="file-info">
-                    <span class="file-name">${file.storedName.replace(/\.lock$/i, '')}</span>
-                </div>
-                <div class="select-box ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); App.toggleSelection('file', ${file.id})"></div>
-            `;
+
+            const typeIcon = document.createElement('div');
+            typeIcon.className = 'file-type-icon';
+            typeIcon.textContent = file.mimeType.split('/')[0];
+            card.appendChild(typeIcon);
+
+            const img = document.createElement('img');
+            img.className = 'file-thumb';
+            img.src = url;
+            img.alt = file.storedName; // Safe attribute
+            card.appendChild(img);
+
+            const info = document.createElement('div');
+            info.className = 'file-info';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'file-name';
+            nameSpan.textContent = file.storedName.replace(/\.lock$/i, ''); // Safe textContent
+            info.appendChild(nameSpan);
+
+            card.appendChild(info);
+
+            const selectBox = document.createElement('div');
+            selectBox.className = `select-box ${isSelected ? 'selected' : ''}`;
+            selectBox.onclick = (e) => {
+                e.stopPropagation();
+                App.toggleSelection('file', file.id);
+            };
+            card.appendChild(selectBox);
+
             card.onclick = () => this.openPreview(index);
             this.elements.fileList.appendChild(card);
         });
