@@ -55,13 +55,7 @@
 *   **PWA:** Service Workers, Web Manifest
 *   **Utilities:** JSZip (for export)
 
-## 📱 Screenshots
 
-| Login Screen | Dashboard |
-|:---:|:---:|
-| *Secure PIN entry with hashed verification.* | *Clean, glassmorphic file explorer.* |
-
-*(The beautiful UI is styled with modern CSS variables and glassmorphism effects for a premium feel.)*
 
 
 
