@@ -2,9 +2,6 @@
 
 ![Vault Banner](assets/banner.png)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20PWA-blue)
-![Status](https://img.shields.io/badge/Status-Active-success)
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_App-brightgreen)](https://shadow-vault-mu.vercel.app/)
 
 **Vault** is a privacy-focused, offline-first web application designed to securely store your sensitive images and videos directly in your browser. Unlike cloud storage solutions, Vault keeps your data 100% local on your device using IndexedDB, ensuring that your files never leave your control.
