@@ -73,20 +73,15 @@ const App = {
     updateAuthUI() {
         if (this.state.isSetup) {
             this.elements.authTitle.textContent = 'Unlock Vault';
-            this.elements.authDesc.textContent = 'Enter your PIN to access files.';
+            this.elements.authDesc.textContent = 'Enter your 5-character key to access files.';
         } else {
             this.elements.authTitle.textContent = 'Setup Vault';
-            this.elements.authDesc.textContent = 'Create a 4-digit PIN for your storage.';
+            this.elements.authDesc.textContent = 'Create a 5-character alphanumeric key (must contain at least 1 letter).';
         }
     },
 
     bindEvents() {
-        // Numpad Events
-        document.querySelectorAll('.num-btn[data-value]').forEach(btn => {
-            btn.addEventListener('click', () => this.handlePinInput(btn.dataset.value));
-        });
-
-        document.getElementById('clear-btn').addEventListener('click', () => this.clearPin());
+        document.getElementById('submit-btn').addEventListener('click', () => this.submitPin());
         document.getElementById('submit-btn').addEventListener('click', () => this.submitPin());
 
         // File/Folder Events
@@ -374,57 +369,48 @@ const App = {
         });
     },
 
-    handlePinInput(val) {
-        if (this.state.currentPin.length < 4) {
-            this.state.currentPin += val;
-            this.updatePinDots();
-        }
-    },
-
     clearPin() {
-        this.state.currentPin = '';
-        this.updatePinDots();
+        document.getElementById('password-input').value = '';
         this.elements.authError.classList.add('hidden');
     },
 
-    updatePinDots() {
-        this.elements.pinDots.forEach((dot, idx) => {
-            if (idx < this.state.currentPin.length) {
-                dot.classList.add('filled');
-            } else {
-                dot.classList.remove('filled');
-            }
-        });
-    },
-
     async submitPin() {
-        if (this.state.currentPin.length !== 4) return;
+        const inputVal = document.getElementById('password-input').value;
+        if (inputVal.length !== 5) {
+            this.elements.authError.textContent = 'Key must be exactly 5 characters.';
+            this.elements.authError.classList.remove('hidden');
+            return;
+        }
+        if (!/[a-zA-Z]/.test(inputVal)) {
+            this.elements.authError.textContent = 'Key must contain at least 1 letter.';
+            this.elements.authError.classList.remove('hidden');
+            return;
+        }
 
-        const hash = await CryptoUtils.hashPIN(this.state.currentPin);
+        const hash = await CryptoUtils.hashPIN(inputVal);
 
         if (!this.state.isSetup) {
-            // Setup Mode: Save PIN
-            const pin = this.state.currentPin;
-            const confirmed = confirm(`⚠️ DON'T FORGET YOUR PIN: ${pin}\n\nThis is your master key. You cannot change this PIN later, and there is no "Forgot PIN" option for your security.`);
+            // Setup Mode: Save Key
+            const confirmed = confirm(`⚠️ DON'T FORGET YOUR KEY: ${inputVal}\n\nThis is your master key. You cannot change this later, and there is no recovery option.`);
 
             if (!confirmed) {
                 this.clearPin();
                 return;
             }
 
-            // Save PIN hash to local storage
+            // Save Key hash to local storage
             localStorage.setItem('vaultPinHash', hash);
             this.state.isSetup = true;
             this.state.isAuthenticated = true;
             this.enterVault();
         } else {
-            // Login Mode: Verify PIN
+            // Login Mode: Verify Key
             const savedHash = localStorage.getItem('vaultPinHash');
             if (hash === savedHash) {
                 this.state.isAuthenticated = true;
                 this.enterVault();
             } else {
-                this.elements.authError.textContent = 'Invalid PIN';
+                this.elements.authError.textContent = 'Invalid Key';
                 this.elements.authError.classList.remove('hidden');
                 this.clearPin();
             }
