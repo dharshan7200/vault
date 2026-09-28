@@ -43,17 +43,9 @@ const App = {
     },
 
     async init() {
-        // Check server status
-        try {
-            const res = await fetch('/api/status');
-            const data = await res.json();
-            this.state.isSetup = data.isSetup;
-        } catch (e) {
-            console.warn('Backend not validating setup status, assuming local dev mode or first run', e);
-            // Fallback to local check if server fails? No, purely server-side means we rely on it.
-            // But for robustness in this specific 'fix' context, we default to false.
-            this.state.isSetup = false;
-        }
+        // Check local storage for PIN setup status
+        const savedHash = localStorage.getItem('vaultPinHash');
+        this.state.isSetup = !!savedHash;
 
         this.updateAuthUI();
         this.bindEvents();
@@ -420,49 +412,21 @@ const App = {
                 return;
             }
 
-            try {
-                const response = await fetch('/api/setup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin: this.state.currentPin })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    this.state.isSetup = true;
-                    this.state.isAuthenticated = true;
-                    this.enterVault();
-                } else {
-                    alert('Setup failed: ' + data.message);
-                    this.clearPin();
-                }
-            } catch (err) {
-                console.error('Setup error:', err);
-                alert('Server connection failed');
-            }
+            // Save PIN hash to local storage
+            localStorage.setItem('vaultPinHash', hash);
+            this.state.isSetup = true;
+            this.state.isAuthenticated = true;
+            this.enterVault();
         } else {
             // Login Mode: Verify PIN
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin: this.state.currentPin })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.state.isAuthenticated = true;
-                    this.enterVault();
-                } else {
-                    this.elements.authError.textContent = data.message || 'Invalid PIN';
-                    this.elements.authError.classList.remove('hidden');
-                    this.clearPin();
-                }
-            } catch (err) {
-                console.error('Login error:', err);
-                this.elements.authError.textContent = 'Server connection failed';
+            const savedHash = localStorage.getItem('vaultPinHash');
+            if (hash === savedHash) {
+                this.state.isAuthenticated = true;
+                this.enterVault();
+            } else {
+                this.elements.authError.textContent = 'Invalid PIN';
                 this.elements.authError.classList.remove('hidden');
+                this.clearPin();
             }
         }
     },
