@@ -32,12 +32,23 @@ const VaultDB = {
     },
 
     async addFile(fileData) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.add(fileData);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
+        return new Promise(async (resolve, reject) => {
+            try {
+                const pinHash = localStorage.getItem('vaultPinHash');
+                if (pinHash && fileData.data) {
+                    const encrypted = await CryptoUtils.encryptData(fileData.data, pinHash);
+                    fileData.data = encrypted.encryptedData;
+                    fileData.iv = encrypted.iv;
+                    fileData.isEncrypted = true;
+                }
+                const transaction = this.db.transaction([this.storeName], 'readwrite');
+                const store = transaction.objectStore(this.storeName);
+                const request = store.add(fileData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            } catch (err) {
+                reject(err);
+            }
         });
     },
 
@@ -46,7 +57,21 @@ const VaultDB = {
             const transaction = this.db.transaction([this.storeName], 'readonly');
             const store = transaction.objectStore(this.storeName);
             const request = store.getAll();
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = async () => {
+                const files = request.result;
+                const pinHash = localStorage.getItem('vaultPinHash');
+                try {
+                    for (let file of files) {
+                        if (file.isEncrypted && file.iv && pinHash) {
+                            file.data = await CryptoUtils.decryptData(file.data, file.iv, pinHash);
+                        }
+                    }
+                    resolve(files);
+                } catch (err) {
+                    console.error("Decryption failed for some files", err);
+                    reject(err);
+                }
+            };
             request.onerror = () => reject(request.error);
         });
     },
@@ -56,7 +81,19 @@ const VaultDB = {
             const transaction = this.db.transaction([this.storeName], 'readonly');
             const store = transaction.objectStore(this.storeName);
             const request = store.get(id);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = async () => {
+                const file = request.result;
+                if (!file) return resolve(null);
+                const pinHash = localStorage.getItem('vaultPinHash');
+                try {
+                    if (file.isEncrypted && file.iv && pinHash) {
+                        file.data = await CryptoUtils.decryptData(file.data, file.iv, pinHash);
+                    }
+                    resolve(file);
+                } catch (err) {
+                    reject(err);
+                }
+            };
             request.onerror = () => reject(request.error);
         });
     },
