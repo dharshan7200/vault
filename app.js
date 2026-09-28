@@ -73,10 +73,10 @@ const App = {
     updateAuthUI() {
         if (this.state.isSetup) {
             this.elements.authTitle.textContent = 'Unlock Vault';
-            this.elements.authDesc.textContent = 'Enter your 5-character key to access files.';
+            this.elements.authDesc.textContent = 'Enter your master password to access files.';
         } else {
             this.elements.authTitle.textContent = 'Setup Vault';
-            this.elements.authDesc.textContent = 'Create a 5-character alphanumeric key (must contain at least 1 letter).';
+            this.elements.authDesc.textContent = 'Create a secure master password (you can choose any length).';
         }
     },
 
@@ -376,13 +376,8 @@ const App = {
 
     async submitPin() {
         const inputVal = document.getElementById('password-input').value;
-        if (inputVal.length !== 5) {
-            this.elements.authError.textContent = 'Key must be exactly 5 characters.';
-            this.elements.authError.classList.remove('hidden');
-            return;
-        }
-        if (!/[a-zA-Z]/.test(inputVal)) {
-            this.elements.authError.textContent = 'Key must contain at least 1 letter.';
+        if (inputVal.length < 1) {
+            this.elements.authError.textContent = 'Please enter a password.';
             this.elements.authError.classList.remove('hidden');
             return;
         }

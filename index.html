@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault - Local Secure Media Storage</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="animations.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a1a">
     <link rel="icon" href="favicon.png">
@@ -15,11 +16,16 @@
     <div id="app">
         <!-- Auth Screen (Shared for Setup and Login) -->
         <section id="auth-screen" class="screen hidden">
+            <!-- Animated Background Elements -->
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+            <div class="glow-orb orb-3"></div>
+            
             <div class="glass-card">
                 <h1 id="auth-title">Unlock Vault</h1>
                 <p id="auth-desc">Enter the master PIN to access files.</p>
                 <div class="password-container">
-                    <input type="password" id="password-input" maxlength="5" placeholder="Enter 5-character key" class="glass-input" />
+                    <input type="password" id="password-input" placeholder="Enter master password" class="glass-input" />
                     <button class="action-btn primary-btn" id="submit-btn" style="margin-top: 10px; width: 100%;">Unlock</button>
                 </div>
                 <p id="auth-error" class="error-msg hidden">Invalid PIN. Try again.</p>
